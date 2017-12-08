@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<!-- android:background="#1C41FC"   记一下-->
+    <RelativeLayout
+        android:id="@+id/rl_head"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/title_background">
+
+        <TextView
+            android:id="@+id/tv_tittle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp" />
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:paddingRight="10dp"
+            android:textSize="20sp"
+            android:textColor="#000000" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_foot"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="5dp"
+        android:layout_alignParentEnd="true"
+        android:orientation="horizontal">
+        <TextView 
+            android:id="@+id/tv_page"
+            android:gravity="left"
+             android:layout_width="wrap_content"
+              android:visibility="gone"
+              android:textSize="18sp"
+            android:layout_height="match_parent"/>
+
+        <Button
+            android:id="@+id/bt1"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            android:onClick="onClick"
+             android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_background_null" />
+
+        <Button
+            android:id="@+id/bt2"
+            android:visibility="gone"
+             android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:onClick="onClick"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_background_null" />
+
+        <Button
+            android:id="@+id/bt3"
+            android:visibility="gone"
+             android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:onClick="onClick"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_background_null" />
+
+        <Button
+            android:id="@+id/bt4"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+             android:textColor="#ffffff"
+             android:onClick="onClick"
+            android:textSize="18sp"
+            android:background="@drawable/btn_background_null" />
+
+        <Button
+            android:id="@+id/btn_back"
+            android:text="返回"
+            android:visibility="gone"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onClick"
+            android:background="@drawable/btn_background_null" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/ll_foot"
+        android:layout_below="@id/rl_head" />
+
+</RelativeLayout>
