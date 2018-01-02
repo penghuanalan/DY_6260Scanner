@@ -12,9 +12,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import cn.chinafst.dy_6260scanner.R;
-import cn.chinafst.dy_6260scanner.ShowTime;
+import cn.chinafst.dy_6260scanner.utils.ShowTime;
 
 public abstract class CommonBaseActivity extends FragmentActivity implements OnClickListener{
 	protected Button bt1,bt2,bt3,bt4,bt5;

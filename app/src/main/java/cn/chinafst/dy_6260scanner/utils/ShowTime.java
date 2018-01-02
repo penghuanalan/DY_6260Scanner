@@ -1,4 +1,4 @@
-package cn.chinafst.dy_6260scanner;
+package cn.chinafst.dy_6260scanner.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

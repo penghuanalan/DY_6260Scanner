@@ -1,14 +1,18 @@
-package cn.chinafst.dy_6260scanner;
+package cn.chinafst.dy_6260scanner.activity;
 
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import cn.chinafst.dy_6260scanner.R;
 import cn.chinafst.dy_6260scanner.base.CommonBaseActivity;
 
-public class MainActivity extends CommonBaseActivity {
+/**
+ * Created by Administrator on 2018/1/2.
+ */
 
-
+public class SampleNameActivity extends CommonBaseActivity{
     @Override
     protected void getBegin(View view) {
 
@@ -16,7 +20,7 @@ public class MainActivity extends CommonBaseActivity {
 
     @Override
     protected int setLayout() {
-        return R.layout.activity_main;
+        return R.layout.avtivity_sample_name;
     }
 
     @Override
@@ -26,7 +30,7 @@ public class MainActivity extends CommonBaseActivity {
 
     @Override
     protected void settitle(TextView tittle) {
-
+        tittle.setText("样品检测");
     }
 
     @Override
