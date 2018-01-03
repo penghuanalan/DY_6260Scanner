@@ -1,11 +1,13 @@
 package cn.chinafst.dy_6260scanner.activity;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,15 +24,13 @@ import cn.chinafst.dy_6260scanner.base.CommonBaseActivity;
 public class FunctionIndexActivtiy extends CommonBaseActivity implements AdapterView.OnItemClickListener{
     private GridView gridView;
     @Override
-    protected void getBegin(View view) {
+    protected void setRoorView(TextView tittle, FrameLayout centerView) {
+        tittle.setText("主菜单");
+        View view=LayoutInflater.from(context).inflate(R.layout.activtiy_function_index,null);
         gridView=(GridView)view.findViewById(R.id.gv_function);
         gridView.setOnItemClickListener(this);
         gridView.setAdapter(new FunctionAdapter());
-    }
-
-    @Override
-    protected int setLayout() {
-        return R.layout.activtiy_function_index;
+        centerView.addView(view);
     }
 
     @Override
@@ -38,10 +38,6 @@ public class FunctionIndexActivtiy extends CommonBaseActivity implements Adapter
 
     }
 
-    @Override
-    protected void settitle(TextView tittle) {
-        tittle.setText("主菜单");
-    }
 
     @Override
     protected void setButton(LinearLayout llLayout, TextView page, Button bt1, Button bt2, Button bt3, Button bt4, Button bt5) {
@@ -50,7 +46,12 @@ public class FunctionIndexActivtiy extends CommonBaseActivity implements Adapter
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+        switch (i){
+            case 0:
+                startActivity(new Intent(context,SampleNameActivity.class));
+                break;
+            default:break;
+        }
 
     }
 
@@ -76,7 +77,7 @@ public class FunctionIndexActivtiy extends CommonBaseActivity implements Adapter
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            View view1= LayoutInflater.from(mContext).inflate(R.layout.item_function_index,viewGroup,false);
+            View view1= LayoutInflater.from(context).inflate(R.layout.item_function_index,viewGroup,false);
             ImageView imageView= (ImageView)view1.findViewById(R.id.iv_icon);
             TextView textView=(TextView)view1.findViewById(R.id.tv_item);
             imageView.setImageResource(imgs[i]);

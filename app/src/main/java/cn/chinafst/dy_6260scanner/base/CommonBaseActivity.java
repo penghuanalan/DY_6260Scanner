@@ -19,7 +19,7 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 	protected Button bt1,bt2,bt3,bt4,bt5;
 	protected TextView tittle,time,page;
 	protected FrameLayout centerView;
-	protected Context mContext;
+	protected Context context;
 	protected SharedPreferences sp ;
 	protected LinearLayout llfoot;
 	View view;
@@ -28,10 +28,9 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_common_base_activity);
-		mContext=this;
-		sp = PreferenceManager.getDefaultSharedPreferences(mContext);
+		context=this;
+		sp = PreferenceManager.getDefaultSharedPreferences(context);
 		initView();
-		getBegin(view);
 	}
 
 
@@ -39,7 +38,7 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		ShowTime.ShowTime(mContext, true, time);
+		ShowTime.ShowTime(context, true, time);
 	}
 
 	private void initView() {
@@ -52,13 +51,13 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 		tittle=(TextView) findViewById(R.id.tv_tittle);
 		page=(TextView) findViewById(R.id.tv_page);
 		time=(TextView) findViewById(R.id.tv_time);
-		centerView=(FrameLayout) findViewById(R.id.fl_center);
+		centerView=(FrameLayout)findViewById(R.id.fl_center);
 		setButton(llfoot,page,bt1, bt2, bt3, bt4, bt5);
-		 view = LayoutInflater.from(mContext).inflate(setLayout(), null);
-		centerView.addView(view);
-		settitle(tittle);
+		setRoorView(tittle,centerView);
 	}
-	
+
+	protected abstract void setRoorView(TextView tittle, FrameLayout centerView);
+
 
 	@Override
 	public void onClick(View v) {
@@ -69,10 +68,7 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 	/*
 	 * 初始化
 	 * */
-	protected abstract void getBegin(View view);
-	protected abstract int setLayout() ;
 	protected abstract void doClick(View v) ;
-	protected abstract void settitle(TextView tittle) ;
 	protected abstract void setButton(LinearLayout llLayout,TextView page, Button bt1,Button bt2,Button bt3,Button bt4,Button bt5);
 
 }

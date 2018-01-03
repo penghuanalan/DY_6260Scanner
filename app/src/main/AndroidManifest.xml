@@ -25,6 +25,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:name=".Tapplication"
         android:theme="@style/AppTheme">
         <activity android:name=".activity.LoginInActivity"
             android:screenOrientation="landscape">
@@ -36,6 +37,10 @@
         <activity android:name=".activity.FunctionIndexActivtiy"
             android:screenOrientation="landscape" />
         <activity android:name=".activity.SampleNameActivity"
+            android:screenOrientation="landscape"/>
+        <activity android:name=".activity.DeteciteOneActivity"
+            android:screenOrientation="landscape"/>
+        <activity android:name=".activity.SearchAndBoudDeviceActivity"
             android:screenOrientation="landscape"/>
     </application>
 

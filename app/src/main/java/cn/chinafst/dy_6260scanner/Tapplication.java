@@ -8,35 +8,24 @@ import android.content.SharedPreferences;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
+import cn.chinafst.dy_6260scanner.utils.GreenDaoUtils;
 
 public class Tapplication extends Application {
 		public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
 		private SerialPort mSerialPort = null;
-		private static BluetoothManager bluetoothManager;
 
 	public static Tapplication instance;
 	private static SharedPreferences sp ;
-
+	public  static  Context context;
+	public static Context getContext(){
+		return context;
+	}
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		try {
-			instance=new Tapplication();
-			bluetoothManager=(BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		context=getApplicationContext();
+		GreenDaoUtils.initDatabase();
 	}
 
-	public static BluetoothAdapter getBlueAdapter(){
-		if(bluetoothManager!=null){
-			return 	bluetoothManager.getAdapter();
-		}else{
-			return null;
-		}
-
-	}
-
-	
 }
