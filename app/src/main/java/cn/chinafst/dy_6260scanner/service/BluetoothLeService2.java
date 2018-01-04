@@ -43,8 +43,8 @@ import cn.chinafst.dy_6260scanner.utils.DecodeUtils;
  * Service for managing connection and data communication with a GATT server hosted on a
  * given Bluetooth LE device.
  */
-public class BluetoothLeService extends Service {
-    private final static String TAG = BluetoothLeService.class.getSimpleName();
+public class BluetoothLeService2 extends Service {
+    private final static String TAG = BluetoothLeService2.class.getSimpleName();
     private static final UUID serviceUUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
     private static final UUID characteristicUUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
 
@@ -176,8 +176,8 @@ public class BluetoothLeService extends Service {
     }
 
     public class LocalBinder extends Binder {
-        public BluetoothLeService getService() {
-            return BluetoothLeService.this;
+        public BluetoothLeService2 getService() {
+            return BluetoothLeService2.this;
         }
     }
 

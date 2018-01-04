@@ -78,6 +78,7 @@ public class LoginInActivity extends Activity implements View.OnClickListener{
       for(BluetoothDevice device:bondedDevices){
           if(device.equals("JDY-08")&&!blueToothMac.contains(device.getAddress())){
               blueToothMac.add(device.getAddress());
+              LogPrint.toast(context,device.getAddress());
           }
       }
       if(blueToothMac.size()!=2){
@@ -117,9 +118,12 @@ public class LoginInActivity extends Activity implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_login:
-                scanBlueTooth();
-
-
+            if(sp.getString("channel1","").equals("")||sp.getString("channel2","").equals("")){
+                LogPrint.toast(context,"请先初始化模块");
+                startActivity(new Intent(context,SearchAndBoudDeviceActivity.class));
+            }else{
+                startActivity(new Intent(mContext,FunctionIndexActivtiy.class));
+            }
                 break;
             default:break;
         }

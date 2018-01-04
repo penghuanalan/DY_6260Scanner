@@ -3,6 +3,8 @@ package cn.chinafst.dy_6260scanner.base;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
@@ -22,6 +24,10 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 	protected Context context;
 	protected SharedPreferences sp ;
 	protected LinearLayout llfoot;
+	public Handler handler;
+
+	protected  void doMessage(Message msg){};
+
 	View view;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +36,13 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 		setContentView(R.layout.activity_common_base_activity);
 		context=this;
 		sp = PreferenceManager.getDefaultSharedPreferences(context);
+		handler=new Handler(){
+			@Override
+			public void handleMessage(Message msg) {
+				super.handleMessage(msg);
+				doMessage(msg);
+			}
+		};
 		initView();
 	}
 

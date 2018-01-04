@@ -5,11 +5,9 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +17,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -41,27 +38,7 @@ public class SearchAndBoudDeviceActivity extends CommonBaseActivity {
     private ArrayList<String> deviceMac=new ArrayList<>();
     private   BluetoothManager manager;
     private BluetoothLeService mBluetoothLeService;
-
-    // 代码管理服务生命周期
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            // 判断是否已经初始化蓝牙服务
-            if (!mBluetoothLeService.initialize()) {
-                finish();
-            }
-            // 自动连接到装置上成功启动初始化。
-
-         //  mBluetoothLeService.connect(mDeviceAddress);
-        }
-
-        public void onServiceDisconnected(ComponentName name) {
-            mBluetoothLeService.disconnect();
-            mBluetoothLeService = null;
-        }
-    };
-
+    private ArrayList<String> bundDevices=new ArrayList<>();
 
 
     private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
@@ -86,15 +63,14 @@ public class SearchAndBoudDeviceActivity extends CommonBaseActivity {
         listView = (ListView) view.findViewById(R.id.lv_devics);
         deviceAdapter=new DeviceAdapter(context,devices);
         centerView.addView(view);
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-
         doSearch();
     }
 
     private void doSearch() {
          manager = (BluetoothManager)context.getSystemService(Context.BLUETOOTH_SERVICE);
         adapter = manager.getAdapter();
+
+
         adapter.startLeScan(mLeScanCallback);
         listView.setAdapter(deviceAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -102,36 +78,16 @@ public class SearchAndBoudDeviceActivity extends CommonBaseActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 // 连接新装置
                 adapter.stopLeScan(mLeScanCallback);
-                mServiceConnection = new ServiceConnection() {
-
-                    public void onServiceConnected(ComponentName name, IBinder service) {
-                        mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-                        // 判断是否已经初始化蓝牙服务
-                        if (!mBluetoothLeService.initialize()) {
-                            finish();
-                        }
-                        // 自动连接到装置上成功启动初始化。
-                         mBluetoothLeService.connect(devices.get(i).getAddress());
-                    }
-
-                    public void onServiceDisconnected(ComponentName name) {
-                        mBluetoothLeService.disconnect();
-                        mBluetoothLeService = null;
-                    }
-                };
-
+                bundDevices.add(devices.get(i).getAddress());
+                if(bundDevices.size()==2){
+                    Intent intent= new Intent(context,ChannelSettingActivity.class);
+                    intent.putStringArrayListExtra("devices",bundDevices);
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
     }
-    BluetoothGattCallback callback= new BluetoothGattCallback() {
-
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            super.onConnectionStateChange(gatt, status, newState);
-            LogPrint.toast(context,status+"");
-        }
-    };
-
 
     @Override
     protected void doClick(View v) {

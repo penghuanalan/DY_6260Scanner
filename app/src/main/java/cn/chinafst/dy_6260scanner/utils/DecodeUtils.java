@@ -6,6 +6,13 @@ import android.util.Log;
 
 public class DecodeUtils {
 
+	public static byte[] EXIT_CARD={0x7E,0x11, 0x00, 0x01, 0x02, 0x14, 0x7E};
+	public static byte[] ENTER_CARD={0x7E, 0x11, 0x00, 0x01, 0x03, 0x15, 0x7E};
+	public static byte[] SCAN_CARD={0x7E, 0x11, 0x00, 0x01, 0x01, 0x13, 0x7E};
+	public static byte[] READ_DATA={0x7E, 0x15, 0x00, 0x00, 0x15, 0x7E};
+
+	public static int READ_DATE=200;
+
 	// 将GB2312转化为中文,如bdadcbd5→江苏
 	public static String stringToGbk(String string) throws Exception {
 		byte[] bytes = new byte[string.length() / 2];
