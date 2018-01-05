@@ -1,12 +1,18 @@
 package cn.chinafst.dy_6260scanner.activity;
 
+import android.support.v4.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,13 +21,21 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import cn.chinafst.dy_6260scanner.R;
 import cn.chinafst.dy_6260scanner.base.CommonBaseActivity;
 import cn.chinafst.dy_6260scanner.base.DetectItemBeans;
+import cn.chinafst.dy_6260scanner.fragment.DeteciteNameFragment;
 import cn.chinafst.dy_6260scanner.service.BluetoothLeService;
 import cn.chinafst.dy_6260scanner.service.BluetoothLeService2;
 import cn.chinafst.dy_6260scanner.utils.DecodeUtils;
+import cn.chinafst.dy_6260scanner.utils.DyUtils;
 import cn.chinafst.dy_6260scanner.utils.LogPrint;
+
+import static cn.chinafst.dy_6260scanner.utils.DecodeUtils.ENTER_CARD;
+import static cn.chinafst.dy_6260scanner.utils.DecodeUtils.EXIT_CARD;
+import static cn.chinafst.dy_6260scanner.utils.DecodeUtils.SCAN_CARD;
 
 /**
  * Created by Administrator on 2018/1/3.
@@ -33,7 +47,60 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
     private BluetoothLeService mBluetoothLeService;
     private BluetoothLeService2 mBluetoothLeService2;
     private String channel;
-    private FrameLayout centerView;
+    private FrameLayout frameLayout;
+    private final int READ_DATE=200;
+    private final int GET_DATE=201;
+    private int currentFlag=DecodeUtils.STATE_EXIT;
+
+    //获取到的数据
+   private ArrayList<Double> list=new ArrayList<>();
+
+    private BroadcastReceiver receiver= new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothLeService.EXTRA_DATA.equals(action)) {
+                Bundle bundle = intent.getBundleExtra(BluetoothLeService.EXTRA_DATA);
+                byte[] byteArray = bundle.getByteArray(BluetoothLeService.EXTRA_DATA);
+                int cmd = byteArray[1];
+                int len = (byteArray[2] << 8) | (byteArray[3] & 0x0FF);
+                switch (cmd) {
+                    case 0x14:
+                        /*
+                        * 卡状态
+                        * 0x02 无卡  0x01 有卡
+                        * */
+                        break;
+                    case 0x16:
+                            try{
+                                for (int i = 0; i < len; i = i + 2) {
+                                    double data01 = (byteArray[5 + i] & 0x0FF) * 256 + (byteArray[4 + i] & 0x0FF);
+                                    list.add(data01);
+                                }
+                            }catch (Exception e){
+
+                            }
+
+                        handler.sendEmptyMessage(GET_DATE);
+                        break;
+
+                    case 0x12:
+                            /*
+                            * 进出卡
+                            * */
+                        break;
+
+                    default:
+                        break;
+                }
+
+                LogPrint.toast(context,"广播"+byteArray[1]);
+
+
+            }
+        }
+    };
+
 
     @Override
     protected void onResume() {
@@ -41,49 +108,89 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
 
     }
 
-    @Override
-    protected void doMessage(Message msg) {
-       switch (msg.what){
-          // case DecodeUtils.READ_DATE:
 
-            //   break;
-       }
-
-    }
 
     @Override
     protected void setRoorView(TextView tittle, FrameLayout centerView) {
         //获取蓝牙服务
-        initService();
+
         beans= (DetectItemBeans) getIntent().getSerializableExtra("bean");
         tittle.setText(beans.getDetect_item_name());
         channel= getIntent().getStringExtra("channel");
         View view= LayoutInflater.from(context).inflate(R.layout.activity_detecite_one,null);
-        centerView=(FrameLayout) view.findViewById(R.id.fl_detect_one);
+        frameLayout=(FrameLayout) view.findViewById(R.id.fl_detect_one);
         centerView.addView(view);
+        initService();
+
+        initFragment();
+
+
 
     }
 
+    private void initFragment() {
+       FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        DeteciteNameFragment fragment= new DeteciteNameFragment();
+        transaction.replace(R.id.fl_detect_one,fragment);
+        transaction.commit();
+    }
+
+    @Override
+    protected void doMessage(Message msg) {
+
+        switch (msg.what){
+            case READ_DATE:
+                mBluetoothLeService.write(DecodeUtils.READ_DATA);
+                break;
+
+            case GET_DATE:
+                dealData();
+                break;
+            default:break;
+        }
+    }
+
+    private void dealData() {
+        double[] sourse=new double[list.size()];
+        for(int i=0;i<list.size();i++){
+            sourse[i]=list.get(i);
+        }
+        double[] doubles = DyUtils.dyMath(sourse);
+        ArrayList<Double> doubles1 = DyUtils.doubles;
+    }
+
     /*
-  * 连接两个蓝牙设备
-  * */
+      * 连接两个蓝牙设备
+      * */
     private void initService() {
         Intent serviceIntent1 = new Intent(this, BluetoothLeService.class);
         Intent serviceIntent2 = new Intent(this, BluetoothLeService2.class);
         bindService(serviceIntent1, mServiceConnection, BIND_AUTO_CREATE);
         bindService(serviceIntent2, mServiceConnection, BIND_AUTO_CREATE);
-
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.EXTRA_DATA);
+        registerReceiver(receiver,intentFilter);
     }
 
     @Override
     protected void doClick(View v) {
         switch (v.getId()){
             case R.id.bt4:
-                mBluetoothLeService.write(DecodeUtils.SCAN_CARD);
-                handler.sendEmptyMessageDelayed(DecodeUtils.READ_DATE,3000);
+                mBluetoothLeService.write(SCAN_CARD);
+               handler.sendEmptyMessageDelayed(READ_DATE,11000);
                 break;
             case R.id.btn_back:
+
+                if(currentFlag==DecodeUtils.STATE_EXIT){
+                    mBluetoothLeService.write(ENTER_CARD);
+                }
+                unbindService(mServiceConnection);
+                unregisterReceiver(receiver);
+                finish();
                 break;
+
+            default:break;
         }
     }
 
@@ -95,16 +202,19 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
         bt4.setVisibility(View.VISIBLE);
     }
 
+
+
     private ServiceConnection mServiceConnection = new ServiceConnection() {
 
         public void onServiceConnected(ComponentName name, IBinder service) {
             if (name.getShortClassName().equals(".service.BluetoothLeService")) {
                 mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-                mBluetoothLeService.write(DecodeUtils.EXIT_CARD);
+                mBluetoothLeService.write(EXIT_CARD);
+               // handler.sendEmptyMessageDelayed(READ_DATE,100);
                 // 判断是否已经初始化蓝牙服务
             } else if (name.getShortClassName().equals(".service.BluetoothLeService2")) {
                 mBluetoothLeService2 = ((BluetoothLeService2.LocalBinder) service).getService();
-                mBluetoothLeService2.write(DecodeUtils.EXIT_CARD);
+               // mBluetoothLeService2.write(EXIT_CARD);
                 // 判断是否已经初始化蓝牙服务
             }
         }

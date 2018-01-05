@@ -26,8 +26,6 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 	protected LinearLayout llfoot;
 	public Handler handler;
 
-	protected  void doMessage(Message msg){};
-
 	View view;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +42,9 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 			}
 		};
 		initView();
+	}
+
+	protected void doMessage(Message msg) {
 	}
 
 
@@ -76,11 +77,16 @@ public abstract class CommonBaseActivity extends FragmentActivity implements OnC
 	public void onClick(View v) {
 		doClick(v);
 	}
-	
-	
+
+	@Override
+	public void onBackPressed() {
+		doClick(bt5);
+
+	}
+
 	/*
-	 * 初始化
-	 * */
+         * 初始化
+         * */
 	protected abstract void doClick(View v) ;
 	protected abstract void setButton(LinearLayout llLayout,TextView page, Button bt1,Button bt2,Button bt3,Button bt4,Button bt5);
 

@@ -89,7 +89,12 @@ public class FunctionIndexActivtiy extends CommonBaseActivity implements Adapter
 
     @Override
     protected void doClick(View v) {
-
+        switch (v.getId()){
+            case R.id.btn_back:
+                finish();
+                break;
+            default:break;
+        }
     }
 
 

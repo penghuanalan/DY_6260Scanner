@@ -94,10 +94,13 @@ public class SampleNameActivity extends CommonBaseActivity implements AdapterVie
                 startActivity(intent);
                 alertDialog.dismiss();
                 break;
-            case R.id.btn_back:
+            case R.id.btn_no_back:
                 channelOneClick=false;
                 channelTwoClick=false;
                 alertDialog.dismiss();
+                break;
+            case R.id.btn_back:
+                finish();
                 break;
 
         }
