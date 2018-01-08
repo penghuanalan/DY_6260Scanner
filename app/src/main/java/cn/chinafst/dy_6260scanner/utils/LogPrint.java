@@ -11,7 +11,7 @@ import android.widget.Toast;
 public class LogPrint {
 
 	static boolean isOpen =true;
-	static String MyTag = "MyTag";
+	static String MyTag = "DY-6260";
 	static final String CLASS_METHOD_LINE_FORMAT = "%s.%s()  Line:%d";
 
 	// 可跟踪的打印

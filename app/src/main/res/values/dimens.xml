@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="commomTextSize" >20sp</dimen>
+    <dimen name="TextSizeMax" >30sp</dimen>
     <dimen name="commonSpace">20dp</dimen>
 
 

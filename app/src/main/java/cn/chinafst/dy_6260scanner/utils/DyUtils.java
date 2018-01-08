@@ -432,6 +432,10 @@ public class DyUtils {
 		return value;
 	}
 	public static double[]  dyMath(double[] orign) {
+/*
+* 清除已有数据
+* */
+		doubles.clear();
 
 		//平滑处理
 		double[] db4wdt = DB4WDT(orign);

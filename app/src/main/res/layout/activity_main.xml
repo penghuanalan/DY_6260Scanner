@@ -10,6 +10,8 @@
         android:layout_height="41dp"
         android:layout_marginLeft="526dp"
         android:layout_marginTop="260dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:background="@drawable/input_box"
         android:clickable="true" >
 

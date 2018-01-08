@@ -10,9 +10,10 @@ public class DecodeUtils {
     public static byte[] ENTER_CARD = {0x7E, 0x11, 0x00, 0x01, 0x03, 0x15, 0x7E};
     public static byte[] SCAN_CARD = {0x7E, 0x11, 0x00, 0x01, 0x01, 0x13, 0x7E};
     public static byte[] READ_DATA = {0x7E, 0x15, 0x00, 0x00, 0x15, 0x7E};
+    public static byte[] CARD_STATE = {0x7E, 0x13, 0x00, 0x00, 0x13, 0x7E };
 
     public static final int STATE_EXIT = 300;
-    public static final int STATE_READ = 300;
+    public static final int STATE_READ = 301;
 
 
     // 将GB2312转化为中文,如bdadcbd5→江苏
