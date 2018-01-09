@@ -109,6 +109,9 @@ public class FunctionIndexActivtiy extends CommonBaseActivity implements Adapter
             case 0:
                 startActivity(new Intent(context, SampleNameActivity.class));
                 break;
+            case 1:
+                startActivity(new Intent(context,CheckRecordActivity.class));
+                break;
             default:
                 break;
         }

@@ -49,6 +49,7 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
     private FrameLayout frameLayout;
     private final int READ_DATE=200;
     private final int GET_DATE=201;
+    private final int READ_EXIT=202;
     private int currentFlag=DecodeUtils.STATE_EXIT;
     private LinearLayout llSampleDetail;
     private  FragmentTransaction transaction;
@@ -77,7 +78,12 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
                             currentFlag=DecodeUtils.STATE_READ;
                             bt4.setVisibility(View.GONE);
                             bt5.setEnabled(false);
-                            mBluetoothLeService.write(SCAN_CARD);
+
+                            if(channel.equals("one")){
+                                mBluetoothLeService.write(SCAN_CARD);
+                            }else if(channel.equals("two")){
+                                mBluetoothLeService2.write(SCAN_CARD);
+                            }
                             handler.sendEmptyMessageDelayed(READ_DATE,11000);
                         }
                         break;
@@ -115,7 +121,6 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
     }
 
 
-
     @Override
     protected void setRoorView(TextView tittle, FrameLayout centerView) {
         //获取蓝牙服务
@@ -124,6 +129,7 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
         beans= (DetectItemBeans) getIntent().getSerializableExtra("bean");
         tittle.setText(beans.getDetect_item_name());
         channel= getIntent().getStringExtra("channel");
+
         View view= LayoutInflater.from(context).inflate(R.layout.activity_detecite_one,null);
         frameLayout=(FrameLayout) view.findViewById(R.id.fl_detect_one);
         llSampleDetail=(LinearLayout) view.findViewById(R.id.ll_sample_dateil);
@@ -140,13 +146,22 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
         switch (msg.what){
             //读取数据
             case READ_DATE:
-                mBluetoothLeService.write(DecodeUtils.READ_DATA);
+                if(channel.equals("one")){
+                    mBluetoothLeService.write(DecodeUtils.READ_DATA);
+                }else if(channel.equals("two")){
+                    mBluetoothLeService2.write(DecodeUtils.READ_DATA);
+                }
                 break;
             //解析数据
             case GET_DATE:
                 llSampleDetail.setVisibility(View.GONE);
                 bt5.setEnabled(true);
                 dealData();
+                break;
+
+            case READ_EXIT:
+                bt4.setVisibility(View.VISIBLE);
+                llSampleDetail.setVisibility(View.VISIBLE);
                 break;
             default:break;
         }
@@ -168,11 +183,11 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
 
         //数据库操作
         CheckRecordBean bean= new CheckRecordBean();
-        //bean.setId();
+        bean.setId(DecodeUtils.getOnlyID(context));
+        bean.setCheck_date(DecodeUtils.getDate_default());
+        bean.setCheck_result(doubles1.toString());
 
         GreenDaoUtils.getDaoSession().getCheckRecordBeanDao().insert(bean);
-
-
 
         LogPrint.e("获取的长度------"+list.size()+"--points"+points.length);
         FragmentManager fm = getSupportFragmentManager();
@@ -181,6 +196,7 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
 
         Bundle bundle=new Bundle();
         bundle.putDoubleArray("data",points);
+        bundle.putDoubleArray("result",doubles);
         fragment.setArguments(bundle);
         transaction.replace(R.id.fl_detect_one,fragment);
         transaction.commit();
@@ -205,22 +221,37 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
     protected void doClick(View v) {
         switch (v.getId()){
             case R.id.bt4:
-                mBluetoothLeService.write(CARD_STATE);
+                if(channel.equals("one")){
+                    mBluetoothLeService.write(CARD_STATE);
+                }else if(channel.equals("two")){
+                    mBluetoothLeService2.write(CARD_STATE);
+                }
                 break;
             case R.id.btn_back:
                 if(currentFlag==DecodeUtils.STATE_EXIT){
-                    mBluetoothLeService.write(ENTER_CARD);
+                    if(channel.equals("one")){
+                        mBluetoothLeService.write(ENTER_CARD);
+                    }else if(channel.equals("two")){
+                        mBluetoothLeService2.write(ENTER_CARD);
+                    }
                     unbindService(mServiceConnection);
                     unregisterReceiver(receiver);
                     finish();
                 }else if(currentFlag==DecodeUtils.STATE_READ){
                     list.clear();
                     fragment=null;
-                    mBluetoothLeService.write(EXIT_CARD);
+                    if(channel.equals("one")){
+                        mBluetoothLeService.write(EXIT_CARD);
+
+                    }else if(channel.equals("two")){
+                        mBluetoothLeService2.write(EXIT_CARD);
+                    }
                     currentFlag=DecodeUtils.STATE_EXIT;
                     transaction.remove(fragment);
-                    bt4.setVisibility(View.VISIBLE);
                     frameLayout.setVisibility(View.GONE);
+
+                    handler.sendEmptyMessageDelayed(READ_EXIT,3000);
+
                 }
 
                 break;
@@ -243,19 +274,25 @@ public class DeteciteOneActivity extends CommonBaseActivity  {
         public void onServiceConnected(ComponentName name, IBinder service) {
             if (name.getShortClassName().equals(".service.BluetoothLeService")) {
                 mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-                mBluetoothLeService.write(EXIT_CARD);
-               // handler.sendEmptyMessageDelayed(READ_DATE,100);
-                // 判断是否已经初始化蓝牙服务
+                //mBluetoothLeService.write(EXIT_CARD);
+                if(channel.equals("one")){
+                    mBluetoothLeService.write(EXIT_CARD);
+                }
             } else if (name.getShortClassName().equals(".service.BluetoothLeService2")) {
                 mBluetoothLeService2 = ((BluetoothLeService2.LocalBinder) service).getService();
-               // mBluetoothLeService2.write(EXIT_CARD);
-                // 判断是否已经初始化蓝牙服务
+                if(channel.equals("two")){
+                    mBluetoothLeService2.write(EXIT_CARD);
+                }
             }
+
+
         }
 
         public void onServiceDisconnected(ComponentName name) {
             mBluetoothLeService.disconnect();
             mBluetoothLeService = null;
+            mBluetoothLeService2.disconnect();
+            mBluetoothLeService2 = null;
             Log.e("a", "服务停止");
         }
     };

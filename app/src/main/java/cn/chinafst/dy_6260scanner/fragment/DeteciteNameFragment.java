@@ -26,20 +26,34 @@ import cn.chinafst.dy_6260scanner.utils.LogPrint;
  */
 
 public class DeteciteNameFragment extends Fragment {
-    private TextView etSampleNmae;
+    private TextView etSampleNmae,tvResult,tvConclution;
     private LineChart chart;
     private double[] data;
-    private TextView tvConclution;
+    private double[] result;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view=inflater.inflate(R.layout.fragment_detecite_name,container,false);
-        etSampleNmae=view.findViewById(R.id.et_sample_name);
-        chart=(LineChart)view.findViewById(R.id.chart_one);
-        tvConclution=(TextView) view.findViewById(R.id.tv_sample_conclusion);
-        data= getArguments().getDoubleArray("data");
 
+        chart=(LineChart)view.findViewById(R.id.chart_one);
+        etSampleNmae=view.findViewById(R.id.et_sample_name);
+        tvConclution=(TextView) view.findViewById(R.id.tv_sample_conclusion);
+        tvResult=(TextView) view.findViewById(R.id.tv_sample_result);
+        data= getArguments().getDoubleArray("data");
+        result=getArguments().getDoubleArray("result");
+        tvResult.setText(result[1]+"");
+        if(result[0]>0.05){
+            if(result[1]>0.05){
+                tvConclution.setText("阴性");
+            }else if(result[1]<0.02){
+                tvConclution.setText("阳性");
+            }else{
+                tvConclution.setText("可疑");
+            }
+        }else{
+            tvConclution.setText("无效");
+        }
         LogPrint.e("fragment长度"+data.length);
         chart.setScaleEnabled(true);
         ArrayList<Entry> yVals = new ArrayList<Entry>();

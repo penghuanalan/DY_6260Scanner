@@ -29,22 +29,25 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import cn.chinafst.dy_6260scanner.utils.DecodeUtils;
+import cn.chinafst.dy_6260scanner.utils.LogPrint;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
  * given Bluetooth LE device.
  */
 public class BluetoothLeService2 extends Service {
-    private final static String TAG = BluetoothLeService2.class.getSimpleName();
+    private final static String TAG = BluetoothLeService.class.getSimpleName();
     private static final UUID serviceUUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
     private static final UUID characteristicUUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
 
@@ -115,7 +118,15 @@ public class BluetoothLeService2 extends Service {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             }
-            System.out.println("读取"+characteristic.toString());
+            try {
+                byteArrayOutputStream.write(characteristic.getValue());
+                byte[] byteData = byteArrayOutputStream.toByteArray();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
 
         @Override
@@ -125,15 +136,16 @@ public class BluetoothLeService2 extends Service {
             try {
                 byteArrayOutputStream.write(characteristic.getValue());
                 byte[] byteData = byteArrayOutputStream.toByteArray();
-                if(byteData[0]==0x72&&byteData[byteData.length-1]==0x7e){
-                    Log.e("最终数据" ,  DecodeUtils.byte2HexStr(byteData) + "");
+                int flag = byteData[0];
+                int endflag = byteData[byteData.length - 1];
+                if (flag == 0x7E && endflag == 0x7E) {
+                    broadcastUpdate(EXTRA_DATA,byteData);
+                    byteArrayOutputStream.reset();
+                    byteArrayOutputStream.close();
                 }
-                Log.e("读取数据" ,  DecodeUtils.byte2HexStr(byteData) + "");
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            System.out.println("读取2"+characteristic.getValue());
         }
     };
 
@@ -142,8 +154,20 @@ public class BluetoothLeService2 extends Service {
         sendBroadcast(intent);
     }
 
-    private void broadcastUpdate(final String action,
-                                 final BluetoothGattCharacteristic characteristic) {
+    /*
+    更新数据的广播
+    * */
+    private void broadcastUpdate(final String action, byte[] bb) {
+        final Intent intent = new Intent();
+        intent.setAction(action);
+        Bundle bundle = new Bundle();
+        bundle.putByteArray(EXTRA_DATA,bb);
+        intent.putExtra(EXTRA_DATA, bundle);
+        sendBroadcast(intent);
+    }
+
+
+    private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
         // This is special handling for the Heart Rate Measurement profile.  Data parsing is
@@ -167,7 +191,7 @@ public class BluetoothLeService2 extends Service {
             final byte[] data = characteristic.getValue();
             if (data != null && data.length > 0) {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
-                for(byte byteChar : data)
+                for (byte byteChar : data)
                     stringBuilder.append(String.format("%02X ", byteChar));
                 intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
             }
@@ -226,11 +250,10 @@ public class BluetoothLeService2 extends Service {
      * Connects to the GATT server hosted on the Bluetooth LE device.
      *
      * @param address The device address of the destination device.
-     *
      * @return Return true if the connection is initiated successfully. The connection result
-     *         is reported asynchronously through the
-     *         {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
-     *         callback.
+     * is reported asynchronously through the
+     * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
+     * callback.
      */
     public boolean connect(final String address) {
         if (mBluetoothAdapter == null || address == null) {
@@ -309,7 +332,7 @@ public class BluetoothLeService2 extends Service {
      * Enables or disables notification on a give characteristic.
      *
      * @param characteristic Characteristic to act on.
-     * @param enabled If true, enable notification.  False otherwise.
+     * @param enabled        If true, enable notification.  False otherwise.
      */
     public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic,
                                               boolean enabled) {
@@ -339,8 +362,10 @@ public class BluetoothLeService2 extends Service {
 
         return mBluetoothGatt.getServices();
     }
+
     // 写操作
     private ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
     public boolean write(byte[] bb) {
         // 每次写之前就重新初始化byteArrayOutputStream
         byteArrayOutputStream = new ByteArrayOutputStream();

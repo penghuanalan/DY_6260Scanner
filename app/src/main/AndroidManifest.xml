@@ -44,7 +44,8 @@
             android:screenOrientation="landscape"/>
         <activity android:name=".activity.ChannelSettingActivity"
             android:screenOrientation="landscape"/>
-
+        <activity android:name=".activity.CheckRecordActivity"
+            android:screenOrientation="landscape"/>
         <service android:name=".service.BluetoothLeService"/>
         <service android:name=".service.BluetoothLeService2"/>
     </application>
